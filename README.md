@@ -2,7 +2,7 @@
 
 SpaceSpy is a macOS utility that provides detailed information about your desktop spaces and monitors. It outputs a JSON structure containing monitor names, UUIDs, display numbers, and space information that matches Mission Control's desktop numbering.
 
-This main purpose of this utility is to to provide display and space number information to be used with [sketchybar](https://github.com/FelixKratz/sketchybar), a macOS status bar utility, when using multiple monitors with variaous arrangements.
+This main purpose of this utility is to provide display and space number information to be used with [sketchybar](https://github.com/FelixKratz/sketchybar), a macOS status bar utility, when using multiple monitors with variaous arrangements.
 
 ## Features
 
