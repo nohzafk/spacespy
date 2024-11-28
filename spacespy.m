@@ -37,6 +37,23 @@ NSString* getDisplayName(NSString* displayID) {
     return displayID;
 }
 
+int getDisplayArrangement(CGDirectDisplayID did) {
+    NSArray<NSScreen *> *screens = [NSScreen screens];
+    int index = 0;
+    
+    for (NSScreen *screen in screens) {
+        NSDictionary *description = [screen deviceDescription];
+        NSNumber *screenID = description[@"NSScreenNumber"];
+        
+        if (screenID && [screenID unsignedIntValue] == did) {
+            return index;
+        }
+        index++;
+    }
+    
+    return -1;
+}
+
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
         // Get the connection ID
@@ -68,9 +85,18 @@ int main(int argc, const char * argv[]) {
                 NSNumber *currentSpace = display[@"Current Space"][@"id64"];
                 NSString *monitorName = getDisplayName(displayID);
                 
+                // Get the display ID from UUID
+                CGDirectDisplayID displayIDNum = 0;
+                CFUUIDRef uuid = CFUUIDCreateFromString(kCFAllocatorDefault, (CFStringRef)displayID);
+                if (uuid) {
+                    displayIDNum = CGDisplayGetDisplayIDFromUUID(uuid);
+                    CFRelease(uuid);
+                }
+
                 NSMutableDictionary *monitorInfo = [NSMutableDictionary dictionary];
                 monitorInfo[@"name"] = monitorName;
                 monitorInfo[@"uuid"] = displayID;
+                monitorInfo[@"display_number"] = @(getDisplayArrangement(displayIDNum) + 1);
                 NSMutableArray *spacesArray = [NSMutableArray array];
                 
                 for (NSDictionary *space in spaces) {
@@ -80,7 +106,7 @@ int main(int argc, const char * argv[]) {
                     BOOL isCurrent = [spaceID isEqualToNumber:currentSpace];
                     
                     [spacesArray addObject:@{
-                        @"index": @(globalSpaceIndex),
+                        @"space_number": @(globalSpaceIndex),
                         @"id": spaceID,
                         @"managed_id": managedSpaceID,
                         @"uuid": spaceUUID,
