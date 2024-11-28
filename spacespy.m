@@ -21,6 +21,7 @@ extern CGSConnectionID CGSMainConnectionID(void);
 extern CGError CGSCopySpaces(CGSConnectionID cid, CGSSpaceSelector type, CGSSpaceID **spaces, int *count);
 extern CGError CGSGetSpaceType(CGSConnectionID cid, CGSSpaceID sid, CGSSpaceType *type);
 extern CFArrayRef CGSCopyManagedDisplaySpaces(const CGSConnectionID cid);
+extern CFArrayRef CGSCopySpacesForLevel(CGSConnectionID connection, int level);
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
@@ -36,16 +37,25 @@ int main(int argc, const char * argv[]) {
             for (NSDictionary *display in displays) {
                 NSString *displayID = display[@"Display Identifier"];
                 NSArray *spaces = display[@"Spaces"];
+                NSNumber *currentSpace = display[@"Current Space"][@"id64"];
                 
                 printf("Display: %s\n", [displayID UTF8String]);
                 
+                int spaceIndex = 1;  // Start counting from 1 for each display
                 for (NSDictionary *space in spaces) {
                     NSNumber *spaceID = space[@"id64"];
                     NSNumber *managedSpaceID = space[@"ManagedSpaceID"];
                     
-                    printf("  Space ID: %lld, Managed Space ID: %lld\n",
+                    // Mark current space with an asterisk
+                    const char *currentMarker = ([spaceID isEqualToNumber:currentSpace]) ? " *" : "";
+                    
+                    printf("  Desktop %d: Space ID: %lld, Managed Space ID: %lld%s\n",
+                           spaceIndex,
                            [spaceID longLongValue],
-                           [managedSpaceID longLongValue]);
+                           [managedSpaceID longLongValue],
+                           currentMarker);
+                    
+                    spaceIndex++;
                 }
                 printf("\n");
             }
